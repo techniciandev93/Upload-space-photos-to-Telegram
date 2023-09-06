@@ -1,14 +1,49 @@
+import argparse
 import os
+import random
+import time
 import telegram
 from dotenv import load_dotenv
+
+
+def get_image_paths(path):
+    file_paths = []
+    for root, dirs, files in os.walk(path):
+        for file_name in files:
+            file_paths.append(os.path.join(root, file_name))
+    return file_paths
+
+
+def get_one_image(images):
+    for image in images:
+        yield image
+
+
+def sender_image_main(tg_bot, path, chat_id, delay):
+    image_paths = get_image_paths(path)
+    gen_images = get_one_image(image_paths)
+    while True:
+        try:
+            image = next(gen_images)
+            tg_bot.send_photo(chat_id, photo=open(image, 'rb'))
+            time.sleep(delay * 60 * 60)
+        except StopIteration:
+            random.shuffle(image_paths)
+            gen_images = get_one_image(image_paths)
+        except telegram.error.NetworkError:
+            continue
+
 
 if __name__ == '__main__':
     load_dotenv()
     telegram_api_token = os.environ['TELEGRAM_API_TOKEN']
-    telegra_group_chat_id = os.environ['TELEGRAM_GROUP_CHAT_ID']
+    telegram_group_chat_id = os.environ['TELEGRAM_GROUP_CHAT_ID']
     nasa_api_key = os.environ['NASA_API_KEY']
-    bot = telegram.Bot(token=telegram_api_token)
 
-    image_url = 'https://api.nasa.gov/EPIC/archive/natural/2019/05/30/png/epic_1b_20190530011359.png?api_key' \
-                f'={nasa_api_key}'
-    bot.send_photo(telegra_group_chat_id, photo=image_url)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("delay", help="Введите время задержки в часах", nargs='?', default=4)
+    args = parser.parse_args()
+
+    bot = telegram.Bot(token=telegram_api_token)
+    image_path = 'images/'
+    sender_image_main(bot, image_path, telegram_group_chat_id, args.delay)
