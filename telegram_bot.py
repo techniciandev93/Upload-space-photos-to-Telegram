@@ -38,7 +38,6 @@ if __name__ == '__main__':
     load_dotenv()
     telegram_api_token = os.environ['TELEGRAM_API_TOKEN']
     telegram_group_chat_id = os.environ['TELEGRAM_GROUP_CHAT_ID']
-    nasa_api_key = os.environ['NASA_API_KEY']
 
     parser = argparse.ArgumentParser()
     parser.add_argument("delay", help="Введите время задержки в часах", nargs='?', default=4)
