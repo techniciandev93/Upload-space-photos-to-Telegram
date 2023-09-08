@@ -10,9 +10,9 @@ def download_images_planet_earth(api_key, path):
     nasa_url = f'https://api.nasa.gov/EPIC/api/natural'
     response = requests.get(nasa_url, params=params)
     response.raise_for_status()
-    for nasa_epic_images_info in response.json():
-        image = f"{nasa_epic_images_info['image']}.png"
-        date = datetime.strptime(nasa_epic_images_info['date'], '%Y-%m-%d %H:%M:%S')
+    for images_data in response.json():
+        image = f"{images_data['image']}.png"
+        date = datetime.strptime(images_data['date'], '%Y-%m-%d %H:%M:%S')
         format_date = date.strftime("%Y/%m/%d")
         image_url = f'https://api.nasa.gov/EPIC/archive/natural/{format_date}/png/{image}'
         download_image(image_url, path, image)
