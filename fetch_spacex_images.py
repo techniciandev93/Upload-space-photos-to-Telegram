@@ -1,7 +1,7 @@
 import argparse
 from pathlib import Path
 import requests
-from services import get_extension, save_file
+from services import get_extension, download_image
 
 
 def fetch_spacex_last_launch(path, launch_id):
@@ -14,7 +14,7 @@ def fetch_spacex_last_launch(path, launch_id):
         response = requests.get(image_url)
         response.raise_for_status()
         extension = get_extension(image_url)
-        save_file(response.content, path, f'spacex_{number}{extension}')
+        download_image(image_url, path, f'spacex_{number}{extension}')
 
 
 if __name__ == '__main__':

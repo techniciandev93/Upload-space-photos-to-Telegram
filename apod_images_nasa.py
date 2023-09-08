@@ -3,7 +3,7 @@ import os
 from pathlib import Path
 import requests
 from dotenv import load_dotenv
-from services import get_extension, save_file
+from services import get_extension, download_image
 
 
 def download_apod_images(api_token, path, image_count):
@@ -13,10 +13,9 @@ def download_apod_images(api_token, path, image_count):
     response = requests.get(nasa_url, params=params)
     response.raise_for_status()
     for number, image_url in enumerate(response.json()):
-        response = requests.get(image_url['url'])
-        response.raise_for_status()
-        extension = get_extension(image_url['url'])
-        save_file(response.content, path, f'nasa_apod_{number}{extension}')
+        extension = get_extension(image_url)
+        file_name = f'nasa_apod_{number}{extension}'
+        download_image(image_url['url'], path, file_name)
 
 
 if __name__ == '__main__':
